@@ -253,6 +253,8 @@ textarea {
   --thread-top: 0px;
   --thread-left: 0px;
   --thread-height: 0px;
+  --edge-space: calc((100vw - min(var(--shell-max), 100vw - var(--gutter) - var(--gutter))) / 2);
+  --overhang: clamp(6px, calc(var(--edge-space) - var(--bleed) - 16px), 40px);
   --bg: #120d0a;
   --bg-soft: #19120e;
   --panel: #211813;
@@ -807,6 +809,32 @@ main > .section-shell {
   line-height: 1.7;
 }
 
+main > .work {
+  z-index: auto;
+}
+
+.work > * {
+  position: relative;
+  z-index: 1;
+}
+
+.work::before {
+  position: absolute;
+  z-index: -1;
+  top: 92px;
+  right: calc(0px - var(--edge-space));
+  bottom: -64px;
+  left: calc(0px - var(--edge-space));
+  border-block: 1px solid var(--line);
+  background-color: var(--bg-soft);
+  background-image:
+    linear-gradient(rgba(247, 241, 236, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247, 241, 236, 0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: '';
+  pointer-events: none;
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -826,7 +854,7 @@ main > .section-shell {
 
 .project-card-large {
   grid-column: 1 / span 7;
-  margin-left: calc(0px - var(--bleed));
+  margin-left: calc(0px - var(--bleed) - var(--overhang));
 }
 
 .project-card-offset {
@@ -836,7 +864,8 @@ main > .section-shell {
 }
 
 .project-card-offset-left {
-  grid-column: 2 / span 5;
+  grid-column: 1 / span 5;
+  margin-left: calc(0px - var(--bleed) - var(--overhang));
 }
 
 .project-card-last {
@@ -1294,7 +1323,7 @@ main > .section-shell {
 }
 
 @media (max-width: 640px) {
-  :root { --shell-max: 640px; --gutter: 21px; --bleed: 12px; --about-indent: 35px; scroll-padding-top: 68px; }
+  :root { --shell-max: 640px; --gutter: 21px; --bleed: 12px; --about-indent: 35px; --overhang: 4px; scroll-padding-top: 68px; }
   .section-space { padding-top: 108px; }
   .site-header { position: absolute; width: calc(100% - 42px); height: 72px; }
   .header-actions { gap: 0; }
@@ -1362,7 +1391,8 @@ main > .section-shell {
   .project-card,
   .project-card-offset,
   .project-card-offset-left,
-  .project-card-last { width: 100%; margin: 0; }
+  .project-card-last { width: calc(100% + var(--bleed) + var(--overhang)); margin: 0 0 0 calc(0px - var(--bleed) - var(--overhang)); }
+  .work::before { top: 64px; bottom: -44px; background-size: 36px 36px; }
   .project-visual { min-height: 220px; aspect-ratio: 1.2; }
   .project-meta { padding-top: 13px; }
   .project-meta h3 { font-size: 16px; }
