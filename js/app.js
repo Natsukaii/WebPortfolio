@@ -151,6 +151,7 @@ languageButtons.forEach((button) => {
   button.addEventListener('click', () => {
     const language = button.dataset.language;
     applyLanguage(language);
+    updateThread();
     try {
       window.localStorage.setItem('portfolio-language', language);
     } catch (error) {
@@ -160,6 +161,45 @@ languageButtons.forEach((button) => {
 });
 
 applyLanguage(getPreferredLanguage());
+
+const main = document.querySelector('main');
+const thread = document.querySelector('.site-thread');
+const offsetWithin = (element, ancestor) => {
+  let top = 0;
+  let left = 0;
+  let current = element;
+
+  while (current && current !== ancestor) {
+    top += current.offsetTop;
+    left += current.offsetLeft;
+    current = current.offsetParent;
+  }
+
+  return current === ancestor ? { top, left } : null;
+};
+
+const updateThread = () => {
+  const title = document.querySelector('.hero-title');
+  const timeline = document.querySelector('.about-timeline');
+  if (!main || !thread || !title || !timeline) return;
+
+  const start = offsetWithin(title, main);
+  const end = offsetWithin(timeline, main);
+  if (!start || !end) return;
+
+  const bottom = end.top + timeline.offsetHeight;
+  if (bottom <= start.top) return;
+
+  main.style.setProperty('--thread-top', `${start.top}px`);
+  main.style.setProperty('--thread-left', `${end.left}px`);
+  main.style.setProperty('--thread-height', `${bottom - start.top}px`);
+  main.classList.add('thread-ready');
+};
+
+updateThread();
+window.addEventListener('load', updateThread, { once: true });
+window.addEventListener('resize', updateThread, { passive: true });
+if ('ResizeObserver' in window && main) new ResizeObserver(updateThread).observe(main);
 
 const loader = document.querySelector('.loader');
 if (loader) {
